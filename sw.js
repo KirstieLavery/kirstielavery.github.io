@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fittogether-v4';
+const CACHE_NAME = 'fittogether-v5';
 const ASSETS = [
   '/',
   '/index.html',
@@ -25,7 +25,7 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch: serve from cache, fall back to network, always serve index.html for navigation
+// Fetch: serve from cache, fall back to network
 self.addEventListener('fetch', event => {
   // Always go to network for Supabase API calls
   if (event.request.url.includes('supabase.co')) {
@@ -33,17 +33,17 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // For navigation requests, always serve index.html
-  if (event.request.mode === 'navigate') {
+  // Only intercept requests for the app files, let everything else through
+  const url = new URL(event.request.url);
+  const appFiles = ['/', '/index.html', '/manifest.json', '/icon-192.png', '/icon-512.png', '/sw.js'];
+
+  if (appFiles.includes(url.pathname)) {
     event.respondWith(
-      caches.match('/index.html').then(cached => {
-        return cached || fetch('/index.html');
-      })
+      caches.match(event.request).then(cached => cached || fetch(event.request))
     );
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
-  );
+  // All other requests (like vietnam-2026.html) go straight to network
+  event.respondWith(fetch(event.request));
 });
