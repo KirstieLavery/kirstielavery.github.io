@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vietnam 2026 — Our Trip</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #1a6b4a;
+  --green-light: #e8f5ef;
+  --green-mid: #2d9b6f;
+  --gold: #c9a84c;
+  --gold-light: #fdf6e3;
+  --red: #c0392b;
+  --red-light: #fdf0ee;
+  --blue: #1a5276;
+  --blue-light: #eaf1f8;
+  --purple: #6c3483;
+  --purple-light: #f4ecf7;
+  --text: #1a1a1a;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --bg: #f9f8f5;
+  --white: #ffffff;
+  --radius: 12px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* HEADER */
+.app-header {
+  background: var(--green);
+  color: white;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+}
+.header-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.header-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
+.header-sub { font-size: 12px; opacity: 0.75; margin-top: 2px; }
+.travelers { display: flex; gap: 6px; flex-wrap: wrap; }
+.traveler-pill {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* TABS */
+.tabs-bar {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 72px;
+  z-index: 40;
+}
+.tabs-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  padding: 0 20px;
+  overflow-x: auto;
+}
+.tab-btn {
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
+.tab-btn:hover:not(.active) { color: var(--text); }
+
+/* MAIN */
+.main { max-width: 900px; margin: 0 auto; padding: 24px 20px; }
+
+/* STATS */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+.stat-card { background: white; border-radius: var(--radius); padding: 14px 12px; text-align: center; border: 1px solid var(--border); }
+.stat-num { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 600; color: var(--green); }
+.stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* SECTION */
+.section { display: none; }
+.section.active { display: block; }
+
+/* DAY CARDS */
+.day-card {
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s;
+}
+.day-header {
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  background: white;
+  user-select: none;
+}
+.day-header:hover { background: #fafafa; }
+.day-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.day-info { flex: 1; }
+.day-name { font-weight: 500; font-size: 15px; }
+.day-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.day-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.day-chevron { color: var(--text-muted); font-size: 12px; transition: transform 0.2s; }
+.day-chevron.open { transform: rotate(180deg); }
+.day-body { padding: 0 18px 14px; display: none; }
+.day-body.open { display: block; }
+.day-divider { height: 1px; background: var(--border); margin-bottom: 12px; }
+
+/* ENTRY ITEMS */
+.entries-list { list-style: none; margin-bottom: 10px; }
+.entry-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+.entry-item:last-child { border-bottom: none; }
+.entry-icon {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.entry-body { flex: 1; min-width: 0; }
+.entry-title { font-size: 14px; font-weight: 500; }
+.entry-detail { font-size: 12px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+.entry-time { font-size: 12px; color: var(--text-muted); white-space: nowrap; margin-top: 2px; }
+.entry-actions { display: flex; gap: 4px; margin-left: auto; flex-shrink: 0; }
+.btn-xs {
+  padding: 3px 8px; font-size: 11px; border-radius: 6px;
+  border: 1px solid var(--border); background: white; cursor: pointer;
+  color: var(--text-muted); transition: all 0.15s;
+}
+.btn-xs:hover { background: var(--bg); color: var(--text); }
+.btn-xs.danger:hover { background: var(--red-light); color: var(--red); border-color: #f5b7b1; }
+
+/* ADD BUTTONS */
+.add-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.btn-add {
+  padding: 6px 12px; font-size: 12px;
+  border: 1px dashed var(--border);
+  border-radius: 8px; background: transparent;
+  color: var(--text-muted); cursor: pointer; transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-add:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+.day-actions { display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f3f4f6; }
+
+/* MAIN BUTTONS */
+.btn-primary {
+  padding: 9px 18px; font-size: 14px; font-weight: 500;
+  background: var(--green); color: white; border: none;
+  border-radius: 8px; cursor: pointer; transition: background 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-primary:hover { background: var(--green-mid); }
+.btn-secondary {
+  padding: 9px 18px; font-size: 14px;
+  background: white; color: var(--text); border: 1px solid var(--border);
+  border-radius: 8px; cursor: pointer; transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-secondary:hover { background: var(--bg); }
+.btn-add-day {
+  width: 100%; padding: 12px;
+  border: 1.5px dashed var(--border); border-radius: var(--radius);
+  background: transparent; color: var(--text-muted);
+  cursor: pointer; font-size: 14px; margin-top: 4px;
+  transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+}
+.btn-add-day:hover { border-color: var(--green); color: var(--green); }
+
+/* NOTES */
+.notes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.notes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.note-card {
+  background: white; border-radius: var(--radius);
+  border: 1px solid var(--border); padding: 14px;
+  box-shadow: var(--shadow);
+}
+.note-cat-badge {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.8px;
+  text-transform: uppercase; padding: 3px 8px;
+  border-radius: 20px; display: inline-block; margin-bottom: 8px;
+}
+.note-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.note-body { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+.note-loc { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+.note-actions { display: flex; gap: 4px; margin-top: 10px; }
+
+/* MODAL */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+  display: none; align-items: center; justify-content: center;
+  z-index: 200; padding: 16px;
+}
+.modal-bg.open { display: flex; }
+.modal {
+  background: white; border-radius: 16px;
+  padding: 24px; width: 100%; max-width: 460px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  max-height: 90vh; overflow-y: auto;
+}
+.modal h3 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; margin-bottom: 18px; }
+.form-group { margin-bottom: 14px; }
+.form-group label { font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 5px; font-weight: 500; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; padding: 9px 12px; font-size: 14px;
+  border: 1px solid var(--border); border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; background: white; color: var(--text);
+  transition: border-color 0.15s;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none; border-color: var(--green);
+}
+.form-group textarea { min-height: 80px; resize: vertical; }
+.form-row { display: flex; gap: 10px; }
+.form-row .form-group { flex: 1; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+
+/* SYNC STATUS */
+.sync-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #4ade80; display: inline-block; margin-right: 5px;
+}
+.sync-label { font-size: 11px; opacity: 0.7; display: flex; align-items: center; }
+
+/* EMPTY */
+.empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
+
+/* LOADING */
+.loading { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+.spinner {
+  width: 32px; height: 32px; border: 3px solid var(--border);
+  border-top-color: var(--green); border-radius: 50%;
+  animation: spin 0.7s linear infinite; margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* SETUP SCREEN */
+.setup-screen {
+  max-width: 500px; margin: 60px auto; padding: 20px;
+  text-align: center;
+}
+.setup-card { background: white; border-radius: 16px; padding: 32px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+.setup-card h2 { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 8px; }
+.setup-card p { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+.setup-card input { width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; font-family: 'DM Sans', sans-serif; }
+.error-msg { color: var(--red); font-size: 13px; margin-top: 8px; }
+
+@media (max-width: 600px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .notes-grid { grid-template-columns: 1fr; }
+  .header-inner { gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- No setup screen needed - config is built in -->
+
+<!-- LOADING -->
+<div id="loading-screen" class="loading">
+  <div class="spinner"></div>
+  <div>Loading your trip...</div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none">
+  <header class="app-header">
+    <div class="header-inner">
+      <div>
+        <div class="header-title">🇻🇳 Vietnam 2026</div>
+        <div class="header-sub">7 Jul – 18 Jul &nbsp;·&nbsp; Adelaide to Hanoi &amp; beyond</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <div class="travelers">
+          <span class="traveler-pill">Kirstie</span>
+          <span class="traveler-pill">Sean</span>
+          <span class="traveler-pill">Mitchell</span>
+          <span class="traveler-pill">Kelita</span>
+        </div>
+        <div class="sync-label"><span class="sync-dot"></span>Live sync on</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="tabs-bar">
+    <div class="tabs-inner">
+      <button class="tab-btn active" onclick="showTab('itinerary')">Itinerary</button>
+      <button class="tab-btn" onclick="showTab('notes')">Notes &amp; Ideas</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="stat-days">11</div><div class="stat-label">Days</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-activities">0</div><div class="stat-label">Activities</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-stays">0</div><div class="stat-label">Stays</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-notes">0</div><div class="stat-label">Notes</div></div>
+    </div>
+
+    <div id="tab-itinerary" class="section active">
+      <div id="days-container"><div class="loading"><div class="spinner"></div></div></div>
+      <button class="btn-add-day" onclick="openAddDay()">+ Add a day</button>
+    </div>
+
+    <div id="tab-notes" class="section">
+      <div class="notes-header">
+        <span style="font-size:14px;color:var(--text-muted)">Ideas for restaurants, shopping &amp; more</span>
+        <button class="btn-primary" onclick="openAddNote()">+ Add note</button>
+      </div>
+      <div class="notes-grid" id="notes-container"></div>
+    </div>
+  </div>
+</div>
+
+<div id="modal" class="modal-bg" onclick="handleModalBgClick(event)"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, onValue, push, remove, update }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+window._fb = { db: null, ref, set, onValue, push, remove, update };
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCJZY5BytRx1mHTQXreMAIi63hwCLu7BDw",
+  authDomain: "vietnam-2026-5256d.firebaseapp.com",
+  databaseURL: "https://vietnam-2026-5256d-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "vietnam-2026-5256d",
+  storageBucket: "vietnam-2026-5256d.firebasestorage.app",
+  messagingSenderId: "784452554572",
+  appId: "1:784452554572:web:6fb16d1553be87265b89e9"
+};
+
+const defaultDays = [
+  {date:'2026-07-07',label:'Day 1',location:'Hanoi (Arrival)',badge:'travel',entries:{
+    e1:{type:'travel',title:'Depart Adelaide',detail:'Fly ADL → HAN',time:'AM',order:0},
+    e2:{type:'travel',title:'Arrive Hanoi Noi Bai Airport',detail:'Transfer to hotel',time:'',order:1}
+  }},
+  {date:'2026-07-08',label:'Day 2',location:'Hanoi',badge:'hanoi',entries:{}},
+  {date:'2026-07-09',label:'Day 3',location:'Hanoi',badge:'hanoi',entries:{}},
+  {date:'2026-07-10',label:'Day 4',location:'Hanoi',badge:'hanoi',entries:{}},
+  {date:'2026-07-11',label:'Day 5',location:'Hanoi → Ha Long Bay',badge:'halong',entries:{
+    e3:{type:'travel',title:'Taxi to Ha Long Bay',detail:'Approx 3.5–4 hrs from Hanoi',time:'AM',order:0},
+    e4:{type:'travel',title:'Board overnight cruise',detail:'Check in & depart Ha Long Bay cruise',time:'Afternoon',order:1}
+  }},
+  {date:'2026-07-12',label:'Day 6',location:'Ha Long Bay (Cruise)',badge:'halong',entries:{}},
+  {date:'2026-07-13',label:'Day 7',location:'Ha Long Bay → Da Nang',badge:'travel',entries:{
+    e5:{type:'travel',title:'Disembark cruise, taxi to Hanoi Airport',detail:'Transfer Ha Long Bay → Noi Bai',time:'AM',order:0},
+    e6:{type:'travel',title:'Fly Hanoi → Da Nang',detail:'HAN → DAD',time:'',order:1}
+  }},
+  {date:'2026-07-14',label:'Day 8',location:'Hoi An',badge:'hoian',entries:{
+    e7:{type:'travel',title:'Transfer to Hoi An',detail:'~30 min from Da Nang airport',time:'',order:0}
+  }},
+  {date:'2026-07-15',label:'Day 9',location:'Hoi An',badge:'hoian',entries:{}},
+  {date:'2026-07-16',label:'Day 10',location:'Hoi An',badge:'hoian',entries:{}},
+  {date:'2026-07-17',label:'Day 11',location:'Da Nang → Home',badge:'travel',entries:{
+    e8:{type:'travel',title:'Transfer to Da Nang Airport',detail:'Head to DAD for departure',time:'',order:0},
+    e9:{type:'travel',title:'Fly Da Nang → Australia',detail:'DAD → Adelaide (arrives 18 July)',time:'',order:1}
+  }}
+];
+
+const badgeStyles = {
+  travel:  {bg:'#e8f5ef',color:'#1a6b4a',dot:'#1a6b4a',label:'Travel'},
+  hanoi:   {bg:'#eaf1f8',color:'#1a5276',dot:'#1a5276',label:'Hanoi'},
+  halong:  {bg:'#f4ecf7',color:'#6c3483',dot:'#6c3483',label:'Hạ Long'},
+  hoian:   {bg:'#fdf6e3',color:'#7d6608',dot:'#c9a84c',label:'Hội An'},
+  danang:  {bg:'#fdf0ee',color:'#922b21',dot:'#c0392b',label:'Đà Nẵng'},
+};
+const typeIcon = {accommodation:'🏨',travel:'✈️',activity:'🎯'};
+const noteCat = {
+  restaurant:{bg:'#e8f5ef',color:'#1a6b4a',label:'Restaurant'},
+  shopping:  {bg:'#fdf6e3',color:'#7d6608',label:'Shopping'},
+  attraction:{bg:'#eaf1f8',color:'#1a5276',label:'Attraction'},
+  tip:       {bg:'#f4ecf7',color:'#6c3483',label:'Tip'},
+  other:     {bg:'#f3f4f6',color:'#4b5563',label:'Other'},
+};
+
+let days = {}, notes = {}, openDays = new Set();
+let daysRef, notesRef;
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+function tryInit() {
+  startApp(FIREBASE_CONFIG);
+}
+
+function startApp(cfg) {
+  const app = initializeApp(cfg);
+  const db = getDatabase(app);
+  window._fb.db = db;
+  daysRef = ref(db, 'days');
+  notesRef = ref(db, 'notes');
+
+  // Seed default data once
+  onValue(daysRef, snap => {
+    if (!snap.exists()) {
+      const seed = {};
+      defaultDays.forEach(d => { seed[uid()] = d; });
+      set(daysRef, seed);
+    }
+  }, { onlyOnce: true });
+
+  // Live listeners
+  onValue(daysRef, snap => {
+    days = snap.val() || {};
+    renderDays();
+    updateStats();
+  });
+  onValue(notesRef, snap => {
+    notes = snap.val() || {};
+    renderNotes();
+    updateStats();
+  });
+
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+// ---- RENDER DAYS ----
+function renderDays() {
+  const container = document.getElementById('days-container');
+  const sorted = Object.entries(days).sort((a,b) => a[1].date.localeCompare(b[1].date));
+  if (!sorted.length) { container.innerHTML = '<div class="empty">No days yet.</div>'; return; }
+  container.innerHTML = sorted.map(([dayId, day]) => {
+    const bs = badgeStyles[day.badge] || badgeStyles.travel;
+    const entries = Object.entries(day.entries || {}).sort((a,b) => (a[1].order||0)-(b[1].order||0));
+    const isOpen = openDays.has(dayId);
+    return `<div class="day-card">
+      <div class="day-header" onclick="toggleDay('${dayId}')">
+        <div class="day-dot" style="background:${bs.dot}"></div>
+        <div class="day-info">
+          <div class="day-name">${esc(day.label)} &mdash; ${formatDate(day.date)}</div>
+          <div class="day-meta">${esc(day.location)}</div>
+        </div>
+        <span class="day-badge" style="background:${bs.bg};color:${bs.color}">${bs.label}</span>
+        <span class="day-chevron ${isOpen?'open':''}">▼</span>
+      </div>
+      <div class="day-body ${isOpen?'open':''}">
+        <div class="day-divider"></div>
+        <ul class="entries-list">
+          ${entries.length ? entries.map(([eid,e]) => renderEntry(dayId,eid,e)).join('') : '<li style="padding:6px 0;font-size:13px;color:var(--text-muted)">No entries yet — add one below.</li>'}
+        </ul>
+        <div class="add-row">
+          <button class="btn-add" onclick="openAddEntry('${dayId}','accommodation')">+ Accommodation</button>
+          <button class="btn-add" onclick="openAddEntry('${dayId}','travel')">+ Travel</button>
+          <button class="btn-add" onclick="openAddEntry('${dayId}','activity')">+ Activity</button>
+        </div>
+        <div class="day-actions">
+          <button class="btn-xs" onclick="openEditDay('${dayId}')">Edit day</button>
+          <button class="btn-xs danger" onclick="deleteDay('${dayId}')">Delete day</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderEntry(dayId, eid, e) {
+  const icon = typeIcon[e.type] || '📌';
+  const colors = {accommodation:'#eaf1f8',travel:'#e8f5ef',activity:'#fdf6e3'};
+  return `<li class="entry-item">
+    <div class="entry-icon" style="background:${colors[e.type]||'#f3f4f6'}">${icon}</div>
+    <div class="entry-body">
+      <div class="entry-title">${esc(e.title)}</div>
+      ${e.detail?`<div class="entry-detail">${esc(e.detail)}</div>`:''}
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0">
+      ${e.time?`<div class="entry-time">${esc(e.time)}</div>`:''}
+      <div class="entry-actions">
+        <button class="btn-xs" onclick="openEditEntry('${dayId}','${eid}')">Edit</button>
+        <button class="btn-xs danger" onclick="deleteEntry('${dayId}','${eid}')">✕</button>
+      </div>
+    </div>
+  </li>`;
+}
+
+// ---- RENDER NOTES ----
+function renderNotes() {
+  const c = document.getElementById('notes-container');
+  const ns = Object.entries(notes);
+  if (!ns.length) { c.innerHTML = '<div class="empty" style="grid-column:1/-1">No ideas yet — tap + Add note to start!</div>'; return; }
+  c.innerHTML = ns.map(([nid,n]) => {
+    const cat = noteCat[n.category] || noteCat.other;
+    return `<div class="note-card">
+      <span class="note-cat-badge" style="background:${cat.bg};color:${cat.color}">${cat.label}</span>
+      <div class="note-title">${esc(n.title)}</div>
+      <div class="note-body">${esc(n.body||'')}</div>
+      ${n.location?`<div class="note-loc">📍 ${esc(n.location)}</div>`:''}
+      <div class="note-actions">
+        <button class="btn-xs" onclick="openEditNote('${nid}')">Edit</button>
+        <button class="btn-xs danger" onclick="deleteNote('${nid}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ---- STATS ----
+function updateStats() {
+  let acts=0, stays=0;
+  Object.values(days).forEach(d => Object.values(d.entries||{}).forEach(e => {
+    if(e.type==='activity') acts++;
+    if(e.type==='accommodation') stays++;
+  }));
+  document.getElementById('stat-days').textContent = Object.keys(days).length;
+  document.getElementById('stat-activities').textContent = acts;
+  document.getElementById('stat-stays').textContent = stays;
+  document.getElementById('stat-notes').textContent = Object.keys(notes).length;
+}
+
+// ---- TABS ----
+window.showTab = function(t) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', ['itinerary','notes'][i]===t));
+  document.getElementById('tab-itinerary').classList.toggle('active', t==='itinerary');
+  document.getElementById('tab-notes').classList.toggle('active', t==='notes');
+};
+
+// ---- TOGGLE DAY ----
+window.toggleDay = function(id) {
+  if(openDays.has(id)) openDays.delete(id); else openDays.add(id);
+  renderDays();
+};
+
+// ---- MODAL ----
+function showModal(html) {
+  const m = document.getElementById('modal');
+  m.innerHTML = `<div class="modal">${html}</div>`;
+  m.classList.add('open');
+}
+window.closeModal = function() { document.getElementById('modal').classList.remove('open'); };
+window.handleModalBgClick = function(e) { if(e.target===document.getElementById('modal')) closeModal(); };
+
+// ---- DAY CRUD ----
+window.openAddDay = function() {
+  showModal(`<h3>Add a day</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Label</label><input id="f-label" placeholder="Day 12" value="Day ${Object.keys(days).length+1}"></div>
+      <div class="form-group"><label>Date</label><input id="f-date" type="date"></div>
+    </div>
+    <div class="form-group"><label>Location</label><input id="f-loc" placeholder="e.g. Hội An"></div>
+    <div class="form-group"><label>Theme</label>
+      <select id="f-badge">
+        <option value="travel">Travel day</option>
+        <option value="hanoi">Hanoi</option>
+        <option value="halong">Ha Long Bay</option>
+        <option value="hoian">Hội An</option>
+        <option value="danang">Đà Nẵng</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveDay()">Add day</button>
+    </div>`);
+};
+
+window.saveDay = function() {
+  const label = document.getElementById('f-label').value.trim();
+  const date = document.getElementById('f-date').value;
+  const location = document.getElementById('f-loc').value.trim();
+  const badge = document.getElementById('f-badge').value;
+  if(!label||!date||!location){alert('Please fill in all fields');return;}
+  const {db,ref:r,set:s} = window._fb;
+  s(r(db,`days/${uid()}`),{date,label,location,badge,entries:{}});
+  closeModal();
+};
+
+window.openEditDay = function(dayId) {
+  const d = days[dayId];
+  showModal(`<h3>Edit day</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Label</label><input id="f-label" value="${esc(d.label)}"></div>
+      <div class="form-group"><label>Date</label><input id="f-date" type="date" value="${d.date}"></div>
+    </div>
+    <div class="form-group"><label>Location</label><input id="f-loc" value="${esc(d.location)}"></div>
+    <div class="form-group"><label>Theme</label>
+      <select id="f-badge">
+        ${['travel','hanoi','halong','hoian','danang'].map(v=>`<option value="${v}" ${d.badge===v?'selected':''}>${badgeStyles[v]?.label||v}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="updateDay('${dayId}')">Save</button>
+    </div>`);
+};
+
+window.updateDay = function(dayId) {
+  const {db,ref:r,update:u} = window._fb;
+  u(r(db,`days/${dayId}`),{
+    label:document.getElementById('f-label').value.trim(),
+    date:document.getElementById('f-date').value,
+    location:document.getElementById('f-loc').value.trim(),
+    badge:document.getElementById('f-badge').value
+  });
+  closeModal();
+};
+
+window.deleteDay = function(dayId) {
+  if(!confirm('Delete this day and all its entries?')) return;
+  const {db,ref:r,remove:rm} = window._fb;
+  rm(r(db,`days/${dayId}`));
+  openDays.delete(dayId);
+};
+
+// ---- ENTRY CRUD ----
+window.openAddEntry = function(dayId, type) {
+  openDays.add(dayId);
+  showModal(`<h3>Add ${type}</h3>
+    <div class="form-group"><label>Type</label>
+      <select id="f-type">
+        <option value="accommodation" ${type==='accommodation'?'selected':''}>🏨 Accommodation</option>
+        <option value="travel" ${type==='travel'?'selected':''}>✈️ Travel</option>
+        <option value="activity" ${type==='activity'?'selected':''}>🎯 Activity</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Title</label><input id="f-title" placeholder="e.g. Check in to hotel"></div>
+    <div class="form-group"><label>Details</label><textarea id="f-detail" placeholder="Confirmation number, address, notes..."></textarea></div>
+    <div class="form-group"><label>Time (optional)</label><input id="f-time" placeholder="e.g. 2:00 PM"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveEntry('${dayId}')">Add</button>
+    </div>`);
+};
+
+window.saveEntry = function(dayId) {
+  const title = document.getElementById('f-title').value.trim();
+  if(!title){alert('Please enter a title');return;}
+  const {db,ref:r,set:s} = window._fb;
+  const order = Object.keys(days[dayId]?.entries||{}).length;
+  s(r(db,`days/${dayId}/entries/${uid()}`),{
+    type:document.getElementById('f-type').value,
+    title,
+    detail:document.getElementById('f-detail').value.trim(),
+    time:document.getElementById('f-time').value.trim(),
+    order
+  });
+  closeModal();
+};
+
+window.openEditEntry = function(dayId, eid) {
+  const e = days[dayId].entries[eid];
+  showModal(`<h3>Edit entry</h3>
+    <div class="form-group"><label>Type</label>
+      <select id="f-type">
+        <option value="accommodation" ${e.type==='accommodation'?'selected':''}>🏨 Accommodation</option>
+        <option value="travel" ${e.type==='travel'?'selected':''}>✈️ Travel</option>
+        <option value="activity" ${e.type==='activity'?'selected':''}>🎯 Activity</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Title</label><input id="f-title" value="${esc(e.title)}"></div>
+    <div class="form-group"><label>Details</label><textarea id="f-detail">${esc(e.detail||'')}</textarea></div>
+    <div class="form-group"><label>Time</label><input id="f-time" value="${esc(e.time||'')}"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="updateEntry('${dayId}','${eid}')">Save</button>
+    </div>`);
+};
+
+window.updateEntry = function(dayId, eid) {
+  const {db,ref:r,update:u} = window._fb;
+  u(r(db,`days/${dayId}/entries/${eid}`),{
+    type:document.getElementById('f-type').value,
+    title:document.getElementById('f-title').value.trim(),
+    detail:document.getElementById('f-detail').value.trim(),
+    time:document.getElementById('f-time').value.trim()
+  });
+  closeModal();
+};
+
+window.deleteEntry = function(dayId, eid) {
+  const {db,ref:r,remove:rm} = window._fb;
+  rm(r(db,`days/${dayId}/entries/${eid}`));
+};
+
+// ---- NOTE CRUD ----
+window.openAddNote = function() {
+  showModal(`<h3>Add note or idea</h3>
+    <div class="form-group"><label>Category</label>
+      <select id="f-cat">
+        <option value="restaurant">Restaurant</option>
+        <option value="shopping">Shopping</option>
+        <option value="attraction">Attraction</option>
+        <option value="tip">Tip</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Title</label><input id="f-title" placeholder="e.g. Bánh mì at Phượng"></div>
+    <div class="form-group"><label>Notes</label><textarea id="f-body" placeholder="What's special, opening hours, how to get there..."></textarea></div>
+    <div class="form-group"><label>Location (optional)</label><input id="f-loc" placeholder="e.g. Hội An Old Town"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveNote()">Add note</button>
+    </div>`);
+};
+
+window.saveNote = function() {
+  const title = document.getElementById('f-title').value.trim();
+  if(!title){alert('Please enter a title');return;}
+  const {db,ref:r,set:s} = window._fb;
+  s(r(db,`notes/${uid()}`),{
+    category:document.getElementById('f-cat').value,
+    title,
+    body:document.getElementById('f-body').value.trim(),
+    location:document.getElementById('f-loc').value.trim()
+  });
+  closeModal();
+};
+
+window.openEditNote = function(nid) {
+  const n = notes[nid];
+  showModal(`<h3>Edit note</h3>
+    <div class="form-group"><label>Category</label>
+      <select id="f-cat">
+        ${Object.entries(noteCat).map(([v,c])=>`<option value="${v}" ${n.category===v?'selected':''}>${c.label}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label>Title</label><input id="f-title" value="${esc(n.title)}"></div>
+    <div class="form-group"><label>Notes</label><textarea id="f-body">${esc(n.body||'')}</textarea></div>
+    <div class="form-group"><label>Location</label><input id="f-loc" value="${esc(n.location||'')}"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="updateNote('${nid}')">Save</button>
+    </div>`);
+};
+
+window.updateNote = function(nid) {
+  const {db,ref:r,update:u} = window._fb;
+  u(r(db,`notes/${nid}`),{
+    category:document.getElementById('f-cat').value,
+    title:document.getElementById('f-title').value.trim(),
+    body:document.getElementById('f-body').value.trim(),
+    location:document.getElementById('f-loc').value.trim()
+  });
+  closeModal();
+};
+
+window.deleteNote = function(nid) {
+  if(!confirm('Delete this note?')) return;
+  const {db,ref:r,remove:rm} = window._fb;
+  rm(r(db,`notes/${nid}`));
+};
+
+function esc(s='') { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function formatDate(str) {
+  const d = new Date(str+'T00:00:00');
+  return d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
+}
+
+tryInit();
+</script>
+</body>
+</html>
