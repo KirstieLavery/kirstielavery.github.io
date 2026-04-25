@@ -952,8 +952,9 @@ function renderChat() {
     const isMe = m.profile === currentProfile;
     const cls = isMe ? "me" : "other " + m.profile;
     const name = names[m.profile] || m.profile;
-    const t = new Date(m.created_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
-    const d = new Date(m.created_at).toLocaleDateString([],{day:"numeric",month:"short"});
+    const ts = m.created_at.endsWith("Z") ? m.created_at : m.created_at + "Z";
+    const t = new Date(ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+    const d = new Date(ts).toLocaleDateString([],{day:"numeric",month:"short"});
     return `<div class="chat-msg ${cls}">
       ${!isMe ? `<div class="chat-name">${name}</div>` : ""}
       <div class="chat-bubble">${m.message.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
