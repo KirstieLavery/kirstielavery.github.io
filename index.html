@@ -423,6 +423,7 @@ body.admin-on .admin-add-panel{display:block}
       <div class="chat-empty">💬 No messages yet — say hello!</div>
     </div>
     <div class="chat-refresh" id="chat-refresh">Auto-refreshing every 15 seconds</div>
+    <div style="padding:8px 20px 0;font-size:0.82rem;font-weight:800;color:var(--muted)" id="chat-sending-as">Sending as: Kirstie</div>
     <div class="chat-input-row">
       <input class="chat-input" id="chat-input" type="text" placeholder="Type a message…" maxlength="500" onkeydown="if(event.key==='Enter')sendChat()"/>
       <button class="chat-send-btn" onclick="sendChat()">Send 💬</button>
@@ -602,6 +603,9 @@ function switchProfile(p) {
     ? "Mum's fitness journey — you're doing brilliantly! 🌸"
     : "Megan's fitness journey — smashing it! 🔥";
   renderLog();
+  const pName = p==="kirstie"?"Kirstie":p==="mum"?"Mum":"Megan";
+  const el = document.getElementById("chat-sending-as");
+  if (el) el.textContent = "Sending as: " + pName;
 }
 
 // ── TAB SWITCH ──
@@ -956,7 +960,7 @@ function renderChat() {
     const t = new Date(ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
     const d = new Date(ts).toLocaleDateString([],{day:"numeric",month:"short"});
     return `<div class="chat-msg ${cls}">
-      ${!isMe ? `<div class="chat-name">${name}</div>` : ""}
+      <div class="chat-name">${name}${isMe ? " (you)" : ""}</div>
       <div class="chat-bubble">${m.message.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
       <div class="chat-time">${d} · ${t}</div>
     </div>`;
