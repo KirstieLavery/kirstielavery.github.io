@@ -32,7 +32,7 @@ header{position:sticky;top:0;z-index:200;background:linear-gradient(135deg,var(-
 .admin-banner.show{display:block}
 
 /* NAV */
-nav{background:white;padding:0 48px;display:flex;box-shadow:0 2px 12px rgba(0,169,157,0.10);overflow-x:auto;scrollbar-width:none;position:relative;z-index:100}
+nav{background:white;padding:0 48px;display:flex;box-shadow:0 2px 12px rgba(0,169,157,0.10);overflow-x:auto;scrollbar-width:none;position:sticky;top:0;z-index:100}
 nav::-webkit-scrollbar{display:none}
 .nav-tab{padding:18px 22px;border:none;background:transparent;font-family:"Nunito",sans-serif;font-size:1.02rem;font-weight:800;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;transition:all 0.25s;white-space:nowrap}
 .nav-tab:hover{color:var(--teal)}.nav-tab.active{color:var(--teal);border-bottom-color:var(--teal)}
@@ -159,6 +159,8 @@ body.admin-on .admin-add-panel{display:block}
 
 /* DB STATUS */
 .db-status{display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:800;padding:6px 14px;border-radius:20px;position:fixed;bottom:24px;right:24px;z-index:500;transition:all 0.3s}
+.home-fab{position:fixed;bottom:24px;left:24px;z-index:500;background:linear-gradient(135deg,var(--teal),var(--teal2));color:white;border:none;border-radius:50px;padding:12px 20px;font-family:"Nunito",sans-serif;font-size:1rem;font-weight:900;cursor:pointer;box-shadow:0 4px 20px rgba(0,169,157,0.4);display:none;align-items:center;gap:8px;transition:all 0.2s}
+.home-fab:hover{opacity:0.88;transform:scale(1.05)}
 .db-status.ok{background:#CCFBF1;color:#0F766E}.db-status.err{background:#FEE2E2;color:#991B1B}.db-status.loading{background:#FEF3C7;color:#B45309}
 
 /* TOAST */
@@ -431,6 +433,7 @@ body.admin-on .admin-add-panel{display:block}
 </main>
 
 <div class="db-status loading" id="db-status">⏳ Connecting…</div>
+<button class="home-fab" id="home-fab" onclick="showTab('home', document.querySelector('.nav-tab'))">🏠 Home</button>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -610,6 +613,11 @@ function showTab(tab, btn) {
   if (tab === "log") renderLog();
   if (tab === "together") refreshTogether();
   if (tab === "chat") { loadChat(); startChatRefresh(); markChatRead(); } else { if (chatInterval) { clearInterval(chatInterval); chatInterval = null; } }
+  // Show floating Home button on all tabs except Home
+  const fab = document.getElementById("home-fab");
+  if (fab) fab.style.display = (tab === "home") ? "none" : "flex";
+  // Scroll nav tab into view on mobile
+  if (btn) btn.scrollIntoView({block:"nearest",inline:"center",behavior:"smooth"});
 }
 
 // ── WELCOME ──
@@ -856,13 +864,23 @@ let lastSeenChatId = localStorage.getItem("lastSeenChatId") || null;
 let unreadCount = 0;
 
 function updateChatBadge(count) {
+  // In-app badge on Chat tab
   const badge = document.getElementById("chat-badge");
-  if (!badge) return;
-  if (count > 0) {
-    badge.textContent = count > 9 ? "9+" : count;
-    badge.style.display = "inline-block";
-  } else {
-    badge.style.display = "none";
+  if (badge) {
+    if (count > 0) {
+      badge.textContent = count > 9 ? "9+" : count;
+      badge.style.display = "inline-block";
+    } else {
+      badge.style.display = "none";
+    }
+  }
+  // App icon badge (iOS 16.4+ / macOS PWA)
+  if ("setAppBadge" in navigator) {
+    if (count > 0) {
+      navigator.setAppBadge(count).catch(() => {});
+    } else {
+      navigator.clearAppBadge().catch(() => {});
+    }
   }
 }
 
@@ -877,13 +895,13 @@ function markChatRead() {
 }
 
 async function checkChatNotifications() {
-  // Only check if we're NOT on the chat tab
+  // Only check if we're NOT currently on the chat tab
   const chatSection = document.getElementById("section-chat");
-  if (chatSection && chatSection.style.display !== "none" && chatSection.style.display !== "") return;
+  if (chatSection && chatSection.classList.contains("active")) return;
   const { data } = await db.from("chat_messages").select("id,profile").order("created_at",{ascending:true}).limit(100);
   if (!data || !data.length) return;
   if (!lastSeenChatId) {
-    // First time — mark everything as read silently
+    // First time — silently mark everything as read
     lastSeenChatId = data[data.length-1].id;
     localStorage.setItem("lastSeenChatId", lastSeenChatId);
     return;
@@ -898,6 +916,8 @@ async function checkChatNotifications() {
 
 function startBgChatCheck() {
   if (chatBgInterval) return;
+  // Check immediately on load, then every 30 seconds
+  setTimeout(checkChatNotifications, 3000);
   chatBgInterval = setInterval(checkChatNotifications, 30000);
 }
 
