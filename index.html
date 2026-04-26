@@ -478,7 +478,7 @@ const videos = {
 };
 
 // ── STATE ──
-let currentProfile = "kirstie";
+let currentProfile = localStorage.getItem("ftProfile") || "kirstie";
 let allLogs = [];
 let isAdmin = false;
 let chartWeek, chartKCats, chartMCats, chartMegCats, chartMonthly;
@@ -593,6 +593,7 @@ async function deleteEntry(id, el) {
 // ── PROFILE SWITCH ──
 function switchProfile(p) {
   currentProfile = p;
+  localStorage.setItem("ftProfile", p);
   document.getElementById("btn-k").classList.toggle("active", p==="kirstie");
   document.getElementById("btn-m").classList.toggle("active", p==="mum");
   document.getElementById("btn-meg").classList.toggle("active", p==="megan");
@@ -986,6 +987,8 @@ function startChatRefresh() {
 document.getElementById("add-date").value = new Date().toISOString().split("T")[0];
 document.getElementById("add-time").value = new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",hour12:false});
 
+// Restore saved profile on load
+switchProfile(currentProfile);
 renderGrids();
 renderHomeRecs();
 updateWelcome();
